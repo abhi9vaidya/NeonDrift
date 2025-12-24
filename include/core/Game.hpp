@@ -2,8 +2,8 @@
 
 #include "core/GameState.hpp"
 #include "core/InputManager.hpp"
+#include "entities/Player.hpp"
 #include <SFML/Graphics.hpp>
-
 
 /**
  * Main Game class
@@ -36,6 +36,9 @@ private:
 
   // Input
   InputManager m_inputManager;
+
+  // Game entities
+  Player m_player;
 
   // Timing
   sf::Clock m_clock;

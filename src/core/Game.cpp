@@ -73,6 +73,11 @@ void Game::processEvents() {
           m_pendingState = GameState::Playing;
           m_stateChangeRequested = true;
         }
+        if (m_currentState == GameState::GameOver) {
+          m_player.reset();
+          m_pendingState = GameState::Playing;
+          m_stateChangeRequested = true;
+        }
       }
     }
 
@@ -100,7 +105,7 @@ void Game::update(float deltaTime) {
     break;
 
   case GameState::Playing:
-    // TODO: Update player, obstacles, particles
+    m_player.update(deltaTime, m_inputManager);
     break;
 
   case GameState::Paused:
@@ -123,11 +128,12 @@ void Game::render() {
     break;
 
   case GameState::Playing:
-    // TODO: Render game world, player, HUD
+    m_player.render(m_window);
     break;
 
   case GameState::Paused:
-    // TODO: Render game world + pause overlay
+    // Render game world (frozen) + pause overlay
+    m_player.render(m_window);
     break;
 
   case GameState::GameOver:
