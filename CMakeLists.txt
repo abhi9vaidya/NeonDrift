@@ -11,8 +11,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# Find SFML
-find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
+# Find SFML (SFML 3.x uses different component names)
+find_package(SFML 3 COMPONENTS Graphics Audio QUIET)
+if(NOT SFML_FOUND)
+    # Fallback to SFML 2.x
+    find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
+endif()
 
 # Collect source files
 file(GLOB_RECURSE SOURCES 
@@ -31,13 +35,22 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/include
 )
 
-# Link SFML
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    sfml-graphics 
-    sfml-window 
-    sfml-system 
-    sfml-audio
-)
+# Link SFML (handle both SFML 2.x and 3.x)
+if(TARGET SFML::Graphics)
+    # SFML 3.x style
+    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        SFML::Graphics 
+        SFML::Audio
+    )
+else()
+    # SFML 2.x style
+    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        sfml-graphics 
+        sfml-window 
+        sfml-system 
+        sfml-audio
+    )
+endif()
 
 # Copy assets to build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
