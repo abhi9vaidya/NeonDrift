@@ -2,8 +2,10 @@
 
 #include "core/GameState.hpp"
 #include "core/InputManager.hpp"
+#include "core/ScoreManager.hpp"
 #include "entities/Player.hpp"
 #include "graphics/ParticleSystem.hpp"
+#include "ui/UIManager.hpp"
 #include <SFML/Graphics.hpp>
 
 /**
@@ -45,6 +47,11 @@ private:
   ParticleSystem m_particles;
   sf::Vector2f m_screenShake;
   float m_shakeIntensity;
+
+  // Scoring and UI
+  ScoreManager m_scoreManager;
+  UIManager m_uiManager;
+  bool m_wasDrifting;
 
   // Timing
   sf::Clock m_clock;

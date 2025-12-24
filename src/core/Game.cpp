@@ -12,8 +12,9 @@ Game::Game()
                sf::Style::Close | sf::Style::Titlebar),
       m_currentState(GameState::Menu), m_pendingState(GameState::Menu),
       m_stateChangeRequested(false), m_screenShake(0.0f, 0.0f),
-      m_shakeIntensity(0.0f), m_accumulator(0.0f) {
+      m_shakeIntensity(0.0f), m_wasDrifting(false), m_accumulator(0.0f) {
   m_window.setFramerateLimit(60);
+  m_uiManager.init(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 void Game::run() {
@@ -82,6 +83,8 @@ void Game::processEvents() {
         }
         if (m_currentState == GameState::GameOver) {
           m_player.reset();
+          m_scoreManager.reset();
+          m_particles.clear();
           m_pendingState = GameState::Playing;
           m_stateChangeRequested = true;
         }
@@ -120,11 +123,23 @@ void Game::update(float deltaTime) {
 
   switch (m_currentState) {
   case GameState::Menu:
-    // Menu update logic (animations, etc.)
+    m_uiManager.update(deltaTime);
     break;
 
   case GameState::Playing:
     m_player.update(deltaTime, m_inputManager);
+    m_uiManager.update(deltaTime);
+
+    // Update scoring
+    m_scoreManager.update(deltaTime, m_player.getSpeed(), m_player.isDrifting(),
+                          m_player.getDriftAmount());
+
+    // Detect drift end for bonus
+    if (m_wasDrifting && !m_player.isDrifting()) {
+      m_scoreManager.onDriftEnd(m_player.getDriftAmount() * 2.0f,
+                                m_player.getSpeed());
+    }
+    m_wasDrifting = m_player.isDrifting();
 
     // Emit drift particles when drifting
     if (m_player.isDrifting() && m_player.getSpeed() > 100.0f) {
@@ -158,23 +173,27 @@ void Game::render() {
 
   switch (m_currentState) {
   case GameState::Menu:
-    // TODO: Render menu UI
+    m_uiManager.renderMenu(m_window);
     break;
 
   case GameState::Playing:
     m_particles.render(m_window);
     m_player.render(m_window);
+    m_uiManager.renderHUD(m_window, m_scoreManager, m_player.getSpeed());
     break;
 
   case GameState::Paused:
     // Render game world (frozen) + pause overlay
     m_particles.render(m_window);
     m_player.render(m_window);
+    m_uiManager.renderHUD(m_window, m_scoreManager, m_player.getSpeed());
+    m_uiManager.renderPauseOverlay(m_window);
     break;
 
   case GameState::GameOver:
     m_particles.render(m_window);
     m_player.render(m_window);
+    m_uiManager.renderGameOver(m_window, m_scoreManager);
     break;
   }
 
