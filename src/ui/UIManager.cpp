@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <sstream>
 
-
 UIManager::UIManager()
     : m_fontLoaded(false), m_windowWidth(1280), m_windowHeight(720),
       m_menuPulse(0.0f), m_neonCyan(0, 255, 255), m_neonMagenta(255, 0, 255),
@@ -13,10 +12,10 @@ bool UIManager::init(unsigned int windowWidth, unsigned int windowHeight) {
   m_windowWidth = windowWidth;
   m_windowHeight = windowHeight;
 
-  // Try to load a font - if not available, we'll use basic shapes
-  if (m_font.openFromFile("assets/fonts/Orbitron-Regular.ttf")) {
+  // Try to load fonts - Windows Arial as reliable fallback
+  if (m_font.openFromFile("C:/Windows/Fonts/arial.ttf")) {
     m_fontLoaded = true;
-  } else if (m_font.openFromFile("C:/Windows/Fonts/arial.ttf")) {
+  } else if (m_font.openFromFile("assets/fonts/Orbitron-Regular.ttf")) {
     m_fontLoaded = true;
   }
 
