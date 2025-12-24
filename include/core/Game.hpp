@@ -3,6 +3,7 @@
 #include "core/GameState.hpp"
 #include "core/InputManager.hpp"
 #include "entities/Player.hpp"
+#include "graphics/ParticleSystem.hpp"
 #include <SFML/Graphics.hpp>
 
 /**
@@ -39,6 +40,11 @@ private:
 
   // Game entities
   Player m_player;
+
+  // Visual effects
+  ParticleSystem m_particles;
+  sf::Vector2f m_screenShake;
+  float m_shakeIntensity;
 
   // Timing
   sf::Clock m_clock;
